@@ -25,38 +25,6 @@ class _UserProfileState extends State<UserProfile> {
       FirebaseAuth.instance.currentUser!.email.toString().trim();
   CollectionReference users = FirebaseFirestore.instance.collection('users');
   @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    setState(() {
-      Future imageurl() async {
-        FutureBuilder<DocumentSnapshot>(
-          future: users.doc(currentUserEmail).get(),
-          builder:
-              (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-            if (snapshot.hasError) {
-              return Text("Something went wrong");
-            }
-
-            if (snapshot.hasData && !snapshot.data!.exists) {
-              return Text("Document does not exist");
-            }
-
-            if (snapshot.connectionState == ConnectionState.done) {
-              Map<String, dynamic> data =
-                  snapshot.data!.data() as Map<String, dynamic>;
-
-              return Text('${data['image']}');
-            }
-
-            return CircularProgressIndicator();
-          },
-        );
-      }
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -69,29 +37,27 @@ class _UserProfileState extends State<UserProfile> {
             Container(
               width: 200,
               height: 300,
-              child: Image.network(imageUrl),
+              child: getImage(currentUserEmail),
             ),
             ElevatedButton(
               onPressed: () async {
-                setState(() async {
-                  ImagePicker imagePicker = ImagePicker();
-                  XFile? file =
-                      await imagePicker.pickImage(source: ImageSource.gallery);
-                  print('${file?.path}');
-                  if (file == null) return;
-                  Reference referenceRoot = FirebaseStorage.instance.ref();
-                  Reference referenceDirImages = referenceRoot.child('images');
-                  Reference referenceImageToUpload =
-                      referenceDirImages.child(currentUserEmail);
-                  try {
-                    await referenceImageToUpload.putFile(File(file!.path));
-                    imageUrl = await referenceImageToUpload.getDownloadURL();
-                    FirebaseFirestore.instance
-                        .collection('users')
-                        .doc(currentUserEmail)
-                        .update({'image': imageUrl});
-                  } catch (error) {}
-                });
+                ImagePicker imagePicker = ImagePicker();
+                XFile? file =
+                    await imagePicker.pickImage(source: ImageSource.gallery);
+                print('${file?.path}');
+                if (file == null) return;
+                Reference referenceRoot = FirebaseStorage.instance.ref();
+                Reference referenceDirImages = referenceRoot.child('images');
+                Reference referenceImageToUpload =
+                    referenceDirImages.child(currentUserEmail);
+                try {
+                  await referenceImageToUpload.putFile(File(file!.path));
+                  imageUrl = await referenceImageToUpload.getDownloadURL();
+                  FirebaseFirestore.instance
+                      .collection('users')
+                      .doc(currentUserEmail)
+                      .update({'image': imageUrl});
+                } catch (error) {}
               },
               child: const Text(
                 'Pick from gallery',

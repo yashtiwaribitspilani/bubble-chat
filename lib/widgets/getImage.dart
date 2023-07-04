@@ -31,7 +31,7 @@ class _getImageState extends State<getImage> {
           Map<String, dynamic> data =
               snapshot.data!.data() as Map<String, dynamic>;
 
-          return Text('${data['image']}');
+          return Image.network(data['image']);
         }
 
         return CircularProgressIndicator();
