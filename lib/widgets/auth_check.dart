@@ -1,4 +1,5 @@
 import 'package:chat_app/screens/login.dart';
+import 'package:chat_app/widgets/hidden_drawer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:chat_app/screens/home.dart';
@@ -13,7 +14,7 @@ class AuthCheck extends StatelessWidget {
           stream: FirebaseAuth.instance.authStateChanges(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              return Home();
+              return HiddenDrawer();
             } else {
               return LoginScreen();
             }
